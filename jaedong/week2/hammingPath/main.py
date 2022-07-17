@@ -1,27 +1,37 @@
-def getHammingDistance(reference, target):
+import copy
+
+
+def getHammingDistance(start, end):
     difference = []
 
-    for i, data in enumerate(reference):
-        if target[i] != data:
+    for i, data in enumerate(start):
+        if end[i] != data:
             difference.append(i)
 
     return difference
 
 
-def getHammingPath(difference):
+def getHammingPath(start, difference):
     path = [a]
     visited = []
+    difference = copy.deepcopy(difference)
 
-    i = 0
-    while len(visited) != (codeCount - 2) and len(difference) != 0:
-        if i == a or i in visited:
+    i = start
+    while len(visited) != (codeCount - len(path)) and len(difference) != 0:
+        if i in path or i in visited:
             i += 1
+            if i >= codeCount:
+                i = 0
             continue
+            
         HammingDistance = getHammingDistance(codeList[path[len(path) - 1]], codeList[i])
         if len(HammingDistance) == 1 and HammingDistance[0] in difference:
             path.append(i)
-            visited.append(i)
             difference.remove(HammingDistance[0])
+            visited.clear()
+
+        else:
+            visited.append(i)
 
         i += 1
         if i >= codeCount:
@@ -46,10 +56,24 @@ a, b = map(int, input().split())
 a, b = a - 1, b - 1
 
 a_b_difference = getHammingDistance(codeList[a], codeList[b])
-pathList.append(getHammingPath(a_b_difference))
-# for i in range(codeCount):
-    # if i == a or i == b:
-        # continue
-    # pathList.append(getHammingPath(a_b_difference))
 
-print(pathList)
+for i in range(codeCount):
+    if getHammingPath(i, a_b_difference) is not None:
+        pathList.append(getHammingPath(i, a_b_difference))
+
+if len(pathList) == 0:
+    print("-1")
+
+else:
+    shortest = codeCount
+    for i, path in enumerate(pathList):
+        if len(path) < shortest:
+            shortest = i
+
+    for i, path in enumerate(pathList):
+        for j, num in enumerate(path):
+            pathList[i][j] = num + 1
+
+    pathList[shortest] = list(map(str, pathList[shortest]))
+    print(" ".join(pathList[shortest]))
+

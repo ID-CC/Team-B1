@@ -11,37 +11,35 @@ def getHammingDistance(start, end):
     return difference
 
 
-def getHammingPath(start, difference):
-    path = [a]
-    visited = []
-    difference = copy.deepcopy(difference)
+def getHammingPath(difference):
+    stack = [a]
+    visited = [[-1, -1]]
 
-    i = start
-    while len(visited) != (codeCount - len(path)) and len(difference) != 0:
-        if i in path or i in visited:
-            i += 1
-            if i >= codeCount:
-                i = 0
-            continue
-            
-        HammingDistance = getHammingDistance(codeList[path[len(path) - 1]], codeList[i])
-        if len(HammingDistance) == 1 and HammingDistance[0] in difference:
-            path.append(i)
-            difference.remove(HammingDistance[0])
-            visited.clear()
+    while len(stack) > 0:
+        flag = False
+        for i in range(codeCount):
+            if i in stack:
+                continue
 
-        else:
-            visited.append(i)
+            c, d = visited[0]
 
-        i += 1
-        if i >= codeCount:
-            i = 0
+            hammingDistance = getHammingDistance(codeList[stack[-1]], codeList[i])
+            if len(hammingDistance) == 1 and hammingDistance[0] in difference:
+                if len(stack) + 1 == c and i == d:
+                    continue
 
-    if len(difference) == 0:
-        return path
-    else:
-        return None
+                stack.append(i)
+                visited = [[len(stack), i]]
 
+                if i == b:
+                    path = copy.deepcopy(stack)
+                    pathList.append(path)
+                    stack.pop()
+                else:
+                    flag = True
+
+        if not flag:
+            visited = [[len(stack), stack.pop()]]
 
 print("입력하세요.")
 
@@ -56,10 +54,7 @@ a, b = map(int, input().split())
 a, b = a - 1, b - 1
 
 a_b_difference = getHammingDistance(codeList[a], codeList[b])
-
-for i in range(codeCount):
-    if getHammingPath(i, a_b_difference) is not None:
-        pathList.append(getHammingPath(i, a_b_difference))
+getHammingPath(a_b_difference)
 
 if len(pathList) == 0:
     print("-1")
@@ -76,4 +71,3 @@ else:
 
     pathList[shortest] = list(map(str, pathList[shortest]))
     print(" ".join(pathList[shortest]))
-
